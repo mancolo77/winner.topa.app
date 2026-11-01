@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'tabs/matches_tab.dart';
 import 'tabs/teams_tab.dart';
-import 'tabs/favorites_tab.dart';
+import 'tabs/my_matches_tab.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   final int initialIndex;
@@ -18,14 +18,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   final List<Widget> _tabs = const [
     MatchesTab(),
     TeamsTab(),
-    FavoritesTab(),
+    MyMatchesTab(),
   ];
 
   @override
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
-    
   }
 
   @override
@@ -65,9 +64,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               label: 'Teams',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.star_outline_rounded),
-              activeIcon: Icon(Icons.star_rounded),
-              label: 'Favorites',
+              icon: Icon(Icons.bookmark_border_rounded),
+              activeIcon: Icon(Icons.bookmark_rounded),
+              label: 'My Matches',
             ),
           ],
         ),
