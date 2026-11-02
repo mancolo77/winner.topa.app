@@ -15,8 +15,18 @@ class _MatchesTabState extends State<MatchesTab> {
   String _statusTab = 'All'; // 'All', 'LIVE', 'Results'
   String _tournament = 'All Tournaments';
 
-  final List<String> _dates = ['Yesterday', 'Today', 'Tomorrow', 'All Dates'];
-  final List<String> _tournaments = ['All Tournaments', 'Rwanda Premier League', 'Peace Cup Rwanda'];
+  final List<Map<String, String>> _dateCards = [
+    {'key': 'Yesterday', 'label': 'OCT 31', 'sub': 'Yesterday'},
+    {'key': 'Today', 'label': 'NOV 01', 'sub': 'Today'},
+    {'key': 'Tomorrow', 'label': 'NOV 02', 'sub': 'Tomorrow'},
+    {'key': 'All Dates', 'label': 'ALL', 'sub': 'Fixtures'},
+  ];
+
+  final List<String> _tournaments = [
+    'All Tournaments',
+    'Rwanda Premier League',
+    'Peace Cup Rwanda',
+  ];
 
   @override
   void initState() {
@@ -65,7 +75,7 @@ class _MatchesTabState extends State<MatchesTab> {
                 children: [
                   Text(
                     m.tournament,
-                    style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13, fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: AppTheme.primary, fontSize: 13, fontWeight: FontWeight.bold),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -78,15 +88,15 @@ class _MatchesTabState extends State<MatchesTab> {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
 
-              // Teams & Score
+              // Scoreboard Card
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: AppTheme.background,
                   borderRadius: BorderRadius.circular(AppTheme.cardRadius),
-                  border: Border.all(color: AppTheme.border),
+                  border: Border.all(color: AppTheme.border.withValues(alpha: 0.6)),
                 ),
                 child: Column(
                   children: [
@@ -107,14 +117,13 @@ class _MatchesTabState extends State<MatchesTab> {
                             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textMain),
                           ),
                         ),
-                        if (m.score != null)
-                          Text(
-                            m.score!.split(':')[0].trim(),
-                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.primary),
-                          ),
+                        Text(
+                          m.score != null ? m.score!.split(' - ')[0] : '-',
+                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppTheme.primary),
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    const Divider(color: AppTheme.border, height: 20),
                     Row(
                       children: [
                         CircleAvatar(
@@ -132,85 +141,104 @@ class _MatchesTabState extends State<MatchesTab> {
                             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textMain),
                           ),
                         ),
-                        if (m.score != null)
-                          Text(
-                            m.score!.split(':')[1].trim(),
-                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.primary),
-                          ),
+                        Text(
+                          m.score != null ? m.score!.split(' - ')[1] : '-',
+                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppTheme.primary),
+                        ),
                       ],
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: AppTheme.filterBg,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('${m.displayDate} • ${m.time}', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 11)),
+                          Text(m.status, style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold, fontSize: 11)),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 14),
-
-              Text('Venue: ${m.stadium}', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
-              const SizedBox(height: 4),
-              Text('Date & Kick-off: ${m.displayDate} • ${m.time}', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
-              const SizedBox(height: 4),
               Row(
                 children: [
-                  const Text('Status: ', style: TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
-                  if (m.isLive)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(color: AppTheme.accentRed, borderRadius: BorderRadius.circular(4)),
-                      child: const Text('LIVE', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white)),
-                    )
-                  else
-                    Text(m.status, style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold, fontSize: 13)),
+                  const Icon(Icons.stadium_outlined, color: AppTheme.textSecondary, size: 16),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(m.stadium, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
+                  ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const Divider(color: AppTheme.border, height: 24),
 
-              const Text('Match Events & Timeline', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textMain)),
-              const SizedBox(height: 8),
+              const Text(
+                'Match Events',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textMain),
+              ),
+              const SizedBox(height: 10),
+
               if (m.events.isEmpty)
                 Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(color: AppTheme.background, borderRadius: BorderRadius.circular(8)),
-                  child: const Center(
-                    child: Text('No events recorded yet for this fixture.', style: TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppTheme.background,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Text(
+                    'No timeline events available for this fixture.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: AppTheme.textSecondary, fontSize: 13),
                   ),
                 )
               else
-                ...m.events.map((ev) {
-                  IconData icon;
-                  Color iconColor;
-                  if (ev.type == 'goal') {
-                    icon = Icons.sports_soccer_rounded;
-                    iconColor = AppTheme.primary;
-                  } else if (ev.type == 'yellow_card') {
-                    icon = Icons.crop_portrait_rounded;
-                    iconColor = AppTheme.primary;
-                  } else if (ev.type == 'red_card') {
-                    icon = Icons.crop_portrait_rounded;
-                    iconColor = AppTheme.accentRed;
-                  } else {
-                    icon = Icons.swap_horiz_rounded;
-                    iconColor = AppTheme.textSecondary;
-                  }
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
+                ...m.events.map((e) {
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: AppTheme.background,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppTheme.border.withValues(alpha: 0.3)),
+                    ),
                     child: Row(
                       children: [
-                        SizedBox(
-                          width: 36,
-                          child: Text('${ev.minute}\'', style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary, fontSize: 13)),
+                        Text("${e.minute}'", style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold, fontSize: 12)),
+                        const SizedBox(width: 10),
+                        Icon(
+                          e.type == 'yellow_card'
+                              ? Icons.square
+                              : e.type == 'red_card'
+                                  ? Icons.square
+                                  : e.type == 'sub'
+                                      ? Icons.swap_horiz
+                                      : Icons.sports_soccer,
+                          size: 16,
+                          color: e.type == 'yellow_card'
+                              ? Colors.amber
+                              : e.type == 'red_card'
+                                  ? AppTheme.accentRed
+                                  : e.type == 'sub'
+                                      ? AppTheme.primary
+                                      : Colors.white,
                         ),
-                        Icon(icon, size: 16, color: iconColor),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 10),
                         Expanded(
-                          child: Text(
-                            '${ev.player} (${ev.team})',
-                            style: const TextStyle(color: AppTheme.textMain, fontSize: 13),
-                          ),
+                          child: Text(e.player, style: const TextStyle(color: AppTheme.textMain, fontWeight: FontWeight.w600, fontSize: 13)),
                         ),
+                        Text(e.team, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
                       ],
                     ),
                   );
                 }),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -220,255 +248,330 @@ class _MatchesTabState extends State<MatchesTab> {
 
   @override
   Widget build(BuildContext context) {
-    final allMatches = _service.matches;
+    var list = _service.matches;
 
-    // Filter by Date
-    final byDate = allMatches.where((m) {
-      if (_selectedDate == 'All Dates') return true;
-      return m.date == _selectedDate;
-    });
+    // Filter by date
+    if (_selectedDate != 'All Dates') {
+      list = list.where((m) => m.displayDate == _selectedDate).toList();
+    }
 
-    // Filter by Tournament
-    final byTour = byDate.where((m) {
-      if (_tournament == 'All Tournaments') return true;
-      return m.tournament == _tournament;
-    });
+    // Filter by status tab
+    if (_statusTab == 'LIVE') {
+      list = list.where((m) => m.isLive).toList();
+    } else if (_statusTab == 'Results') {
+      list = list.where((m) => m.score != null && !m.isLive).toList();
+    }
 
-    // Filter by Status Tab ('All', 'LIVE', 'Results')
-    final filtered = byTour.where((m) {
-      if (_statusTab == 'LIVE') return m.isLive;
-      if (_statusTab == 'Results') return m.score != null && !m.isLive;
-      return true;
-    }).toList();
+    // Filter by tournament
+    if (_tournament != 'All Tournaments') {
+      list = list.where((m) => m.tournament == _tournament).toList();
+    }
 
-    // Group matches by tournament
+    // Group by Tournament
     final Map<String, List<RwandaTopaMatch>> grouped = {};
-    for (var m in filtered) {
+    for (var m in list) {
       grouped.putIfAbsent(m.tournament, () => []).add(m);
     }
 
-    return RefreshIndicator(
-      color: AppTheme.primary,
-      backgroundColor: AppTheme.surfaceCard,
-      onRefresh: _service.refresh,
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(AppTheme.screenPadding, 16, AppTheme.screenPadding, 16),
-        child: Column(
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      appBar: AppBar(
+        backgroundColor: AppTheme.darkNav,
+        elevation: 0,
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Matches',
-                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: AppTheme.textMain),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppTheme.filterBg,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppTheme.border),
-                  ),
-                  child: const Text('Rwanda RPL', style: TextStyle(fontSize: 12, color: AppTheme.primary, fontWeight: FontWeight.bold)),
-                ),
-              ],
+            const Text(
+              'Tournament Match Center',
+              style: TextStyle(color: AppTheme.textMain, fontSize: 19, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 12),
-
-            // 1. Horizontal Date Ribbon
-            SizedBox(
-              height: 38,
-              child: ListView.separated(
+            Text(
+              'Live Feed • Updated ${_service.lastUpdated.hour.toString().padLeft(2, '0')}:${_service.lastUpdated.minute.toString().padLeft(2, '0')}',
+              style: const TextStyle(color: AppTheme.textSecondary, fontSize: 11),
+            ),
+          ],
+        ),
+        actions: [
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppTheme.primary,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: const Center(
+              child: Text(
+                'Demo',
+                style: TextStyle(color: AppTheme.buttonTextDark, fontWeight: FontWeight.bold, fontSize: 11),
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: _service.refresh,
+        color: AppTheme.primary,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(AppTheme.screenPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Top Horizontal Date Ribbon Carousel
+              SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                itemCount: _dates.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 8),
-                itemBuilder: (context, idx) {
-                  final d = _dates[idx];
-                  final active = _selectedDate == d;
-                  return ChoiceChip(
-                    label: Text(d),
-                    selected: active,
-                    onSelected: (_) => setState(() => _selectedDate = d),
-                    selectedColor: AppTheme.primary,
-                    backgroundColor: AppTheme.surfaceCard,
-                    labelStyle: TextStyle(
-                      color: active ? AppTheme.buttonTextDark : AppTheme.textMain,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
+                child: Row(
+                  children: _dateCards.map((d) {
+                    final isSel = _selectedDate == d['key'];
+                    return GestureDetector(
+                      onTap: () => setState(() => _selectedDate = d['key']!),
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: isSel ? AppTheme.primary : AppTheme.surfaceCard,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isSel ? AppTheme.primary : AppTheme.border.withValues(alpha: 0.4),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              d['label']!,
+                              style: TextStyle(
+                                color: isSel ? AppTheme.buttonTextDark : AppTheme.textMain,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              d['sub']!,
+                              style: TextStyle(
+                                color: isSel ? AppTheme.buttonTextDark : AppTheme.textSecondary,
+                                fontSize: 10,
+                                fontWeight: isSel ? FontWeight.w600 : FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(height: 14),
+
+              // Status Filter Buttons (All, LIVE, Results)
+              Row(
+                children: ['All', 'LIVE', 'Results'].map((st) {
+                  final isSel = _statusTab == st;
+                  return Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 3),
+                      child: ElevatedButton(
+                        onPressed: () => setState(() => _statusTab = st),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isSel ? AppTheme.primary : AppTheme.surfaceCard,
+                          foregroundColor: isSel ? AppTheme.buttonTextDark : Colors.white,
+                          elevation: 0,
+                          minimumSize: const Size(0, 38),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: Text(
+                          st,
+                          style: TextStyle(fontSize: 12, fontWeight: isSel ? FontWeight.bold : FontWeight.normal),
+                        ),
+                      ),
                     ),
                   );
-                },
+                }).toList(),
               ),
-            ),
-            const SizedBox(height: 10),
+              const SizedBox(height: 12),
 
-            // 2. Tournament Filter Dropdown
-            DropdownButtonFormField<String>(
-              initialValue: _tournament,
-              dropdownColor: AppTheme.surfaceCard,
-              decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                filled: true,
-                fillColor: AppTheme.surfaceCard,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.buttonRadius),
-                  borderSide: const BorderSide(color: AppTheme.border),
-                ),
-              ),
-              items: _tournaments
-                  .map((t) => DropdownMenuItem(value: t, child: Text(t, style: const TextStyle(fontSize: 13, color: AppTheme.textMain))))
-                  .toList(),
-              onChanged: (val) {
-                if (val != null) setState(() => _tournament = val);
-              },
-            ),
-            const SizedBox(height: 10),
-
-            // 3. Status Tabs: 'All', 'LIVE', 'Results'
-            Row(
-              children: ['All', 'LIVE', 'Results'].map((tab) {
-                final active = _statusTab == tab;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ChoiceChip(
-                    label: Text(tab),
-                    selected: active,
-                    onSelected: (_) => setState(() => _statusTab = tab),
-                    selectedColor: AppTheme.primary,
-                    backgroundColor: AppTheme.filterBg,
-                    labelStyle: TextStyle(
-                      color: active ? AppTheme.buttonTextDark : AppTheme.textMain,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 16),
-
-            if (filtered.isEmpty)
+              // Tournament Dropdown Filter
               Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(28),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
                   color: AppTheme.surfaceCard,
-                  borderRadius: BorderRadius.circular(AppTheme.cardRadius),
-                  border: Border.all(color: AppTheme.border),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppTheme.border.withValues(alpha: 0.5)),
                 ),
-                child: Center(
-                  child: Column(
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _tournament,
+                    dropdownColor: AppTheme.surfaceCard,
+                    isExpanded: true,
+                    icon: const Icon(Icons.arrow_drop_down, color: AppTheme.primary),
+                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                    onChanged: (val) {
+                      if (val != null) setState(() => _tournament = val);
+                    },
+                    items: _tournaments.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Matches Grouped Under Tournament Headers
+              if (grouped.isEmpty)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(32),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceCard,
+                    borderRadius: BorderRadius.circular(AppTheme.cardRadius),
+                  ),
+                  child: const Column(
                     children: [
-                      const Icon(Icons.sports_soccer_rounded, size: 40, color: AppTheme.textSecondary),
-                      const SizedBox(height: 8),
+                      Icon(Icons.event_busy_rounded, size: 48, color: AppTheme.textSecondary),
+                      SizedBox(height: 12),
                       Text(
-                        'No matches found for $_selectedDate ($_statusTab)',
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.textMain),
-                      ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Pull down to refresh or switch date/filters',
-                        style: TextStyle(color: AppTheme.textSecondary, fontSize: 12),
+                        'No fixtures match the selected filters.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
                       ),
                     ],
                   ),
-                ),
-              )
-            else
-              // Grouped by Tournament
-              ...grouped.entries.map((entry) {
-                final tourName = entry.key;
-                final tourMatches = entry.value;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8, top: 4),
-                      child: Text(
-                        tourName,
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.primary),
-                      ),
-                    ),
-                    ...tourMatches.map((m) {
-                      final isSaved = _service.savedMatchIds.contains(m.id);
-                      return Card(
-                        color: AppTheme.surfaceCard,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.cardRadius)),
-                        margin: const EdgeInsets.only(bottom: 12),
-                        child: InkWell(
-                          onTap: () => _openDetails(m),
-                          borderRadius: BorderRadius.circular(AppTheme.cardRadius),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
+                )
+              else
+                ...grouped.entries.map((entry) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Distinct Tournament Header Banner
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        margin: const EdgeInsets.only(top: 6, bottom: 10),
+                        decoration: BoxDecoration(
+                          color: AppTheme.filterBg,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppTheme.border.withValues(alpha: 0.4)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
                               children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(m.displayDate, style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
-                                    if (m.isLive)
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                        decoration: BoxDecoration(color: AppTheme.accentRed, borderRadius: BorderRadius.circular(4)),
-                                        child: const Text('LIVE', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white)),
-                                      )
-                                    else
-                                      Text(m.time, style: const TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Text(m.teamA, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textMain)),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                      decoration: BoxDecoration(color: AppTheme.filterBg, borderRadius: BorderRadius.circular(8)),
-                                      child: Text(
-                                        m.score ?? 'VS',
-                                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppTheme.primary),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Text(
-                                        m.teamB,
-                                        textAlign: TextAlign.right,
-                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textMain),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(m.stadium, style: const TextStyle(fontSize: 11, color: AppTheme.textSecondary)),
-                                    IconButton(
-                                      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
-                                      icon: Icon(
-                                        isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-                                        color: isSaved ? AppTheme.primary : AppTheme.textSecondary,
-                                        size: 22,
-                                      ),
-                                      onPressed: () => _service.toggleSaveMatch(m.id),
-                                    ),
-                                  ],
+                                const Icon(Icons.emoji_events, size: 16, color: AppTheme.primary),
+                                const SizedBox(width: 8),
+                                Text(
+                                  entry.key,
+                                  style: const TextStyle(color: AppTheme.textMain, fontWeight: FontWeight.bold, fontSize: 13),
                                 ),
                               ],
                             ),
-                          ),
+                            Text(
+                              '${entry.value.length} matches',
+                              style: const TextStyle(color: AppTheme.textSecondary, fontSize: 11),
+                            ),
+                          ],
                         ),
-                      );
-                    }),
-                    const SizedBox(height: 8),
-                  ],
-                );
-              }),
-          ],
+                      ),
+                      ...entry.value.map((m) => _buildScoreboardCard(m)),
+                      const SizedBox(height: 8),
+                    ],
+                  );
+                }),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScoreboardCard(RwandaTopaMatch m) {
+    final isSaved = _service.savedMatchIds.contains(m.id);
+    return Card(
+      color: AppTheme.surfaceCard,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: AppTheme.border.withValues(alpha: 0.4)),
+      ),
+      margin: const EdgeInsets.only(bottom: 10),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => _openDetails(m),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Column(
+            children: [
+              // Top info row: Venue & Status
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('${m.displayDate} • ${m.time}', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 11)),
+                  Row(
+                    children: [
+                      if (m.isLive)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          margin: const EdgeInsets.only(right: 6),
+                          decoration: BoxDecoration(color: AppTheme.accentRed, borderRadius: BorderRadius.circular(4)),
+                          child: const Text('LIVE', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                        )
+                      else
+                        Text(m.status, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 11)),
+                      const SizedBox(width: 6),
+                      GestureDetector(
+                        onTap: () => _service.toggleSaveMatch(m.id),
+                        child: Icon(
+                          isSaved ? Icons.star_rounded : Icons.star_outline_rounded,
+                          color: isSaved ? AppTheme.primary : AppTheme.textSecondary,
+                          size: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+
+              // Team A vs Team B Scoreboard Strip
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      m.teamA,
+                      style: const TextStyle(color: AppTheme.textMain, fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppTheme.background,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: AppTheme.border.withValues(alpha: 0.5)),
+                    ),
+                    child: Text(
+                      m.score ?? 'VS',
+                      style: TextStyle(
+                        color: m.score != null ? AppTheme.primary : AppTheme.textSecondary,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      m.teamB,
+                      textAlign: TextAlign.right,
+                      style: const TextStyle(color: AppTheme.textMain, fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  m.stadium,
+                  style: const TextStyle(color: AppTheme.textSecondary, fontSize: 11),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
